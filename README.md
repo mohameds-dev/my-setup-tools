@@ -1,7 +1,6 @@
-# personal-setup-tools
+# my-setup-tools
 
-Just a project to maintain tools I make for my development and personal
-setup, on Linux Mint.
+Just a project to maintain tools I make for my development and personal setup, on Linux Mint.
 
 ## Commands
 

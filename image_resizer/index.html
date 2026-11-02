@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Offline Image Resizer - Document Compressor</title>
+  <title>Image Resizer</title>
   <style>
-    /* Minimal, self-contained styles. No external fonts or CDNs. */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -14,63 +13,51 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #f0f2f5;
-      color: #1a1a1a;
+      background: #f7f7f8;
+      color: #222;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 24px;
     }
 
-    .card {
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      padding: 32px;
+    .container {
+      background: #fff;
+      border: 1px solid #e2e4e8;
+      border-radius: 8px;
+      padding: 28px;
       width: 100%;
-      max-width: 480px;
+      max-width: 420px;
     }
 
     h1 {
-      font-size: 1.4rem;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-
-    .badge {
-      display: inline-block;
-      background: #e6f4ea;
-      color: #137333;
-      font-size: 0.75rem;
+      font-size: 1.25rem;
       font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 20px;
       margin-bottom: 20px;
       text-align: center;
-      width: 100%;
     }
 
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     label {
       display: block;
-      font-weight: 600;
       font-size: 0.85rem;
+      font-weight: 500;
       margin-bottom: 6px;
-      color: #444;
+      color: #555;
     }
 
     input[type="file"],
     select,
     button {
       width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 0.95rem;
+      padding: 9px 12px;
+      border: 1px solid #d0d3d9;
+      border-radius: 6px;
+      font-size: 0.9rem;
       outline: none;
       background: #fff;
     }
@@ -79,302 +66,242 @@
       cursor: pointer;
     }
 
-    select {
-      cursor: pointer;
-    }
-
     button {
-      background: #0066cc;
-      color: #ffffff;
+      background: #111;
+      color: #fff;
       border: none;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
-      margin-top: 6px;
-      transition: background 0.15s ease;
+      margin-top: 4px;
+      transition: opacity 0.15s ease;
     }
 
     button:hover:not(:disabled) {
-      background: #0052a3;
+      opacity: 0.88;
     }
 
     button:disabled {
-      background: #a0c4e8;
+      opacity: 0.45;
       cursor: not-allowed;
     }
 
     #status {
-      margin-top: 16px;
-      font-size: 0.88rem;
-      color: #555;
-      line-height: 1.4;
-    }
-
-    .stats {
       margin-top: 14px;
-      padding: 12px;
-      background: #f8f9fa;
-      border-radius: 8px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
+      color: #666;
+    }
+
+    .info {
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: #f4f5f7;
+      border-radius: 6px;
+      font-size: 0.82rem;
       display: none;
+      line-height: 1.5;
     }
 
-    .stats div {
-      margin-bottom: 4px;
-    }
-
-    .stats div:last-child {
-      margin-bottom: 0;
+    #preview {
+      display: none;
+      margin-top: 14px;
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 4px;
+      border: 1px solid #e2e4e8;
+      object-fit: contain;
     }
 
     #downloadBtn {
       display: none;
-      margin-top: 16px;
+      margin-top: 14px;
       text-align: center;
-      background: #137333;
+      background: #1a7f37;
       color: #fff;
-      padding: 11px 16px;
-      border-radius: 8px;
+      padding: 10px 14px;
+      border-radius: 6px;
       text-decoration: none;
-      font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      font-weight: 500;
     }
 
     #downloadBtn:hover {
-      background: #0d5c28;
-    }
-
-    #previewContainer {
-      display: none;
-      margin-top: 16px;
-      text-align: center;
-    }
-
-    #previewImage {
-      max-width: 100%;
-      max-height: 220px;
-      border-radius: 6px;
-      border: 1px solid #e0e0e0;
-      object-fit: contain;
+      background: #14662c;
     }
   </style>
 </head>
 <body>
 
-  <main class="card">
-    <h1>Document Image Resizer</h1>
-    <div class="badge">🔒 100% Offline &amp; Private — Zero Network Calls</div>
+  <main class="container">
+    <h1>Image Resizer</h1>
 
-    <form id="resizerForm" onsubmit="event.preventDefault(); processImage();">
+    <form id="resizerForm" onsubmit="event.preventDefault(); resizeImage();">
       <div class="form-group">
-        <label for="imageInput">Choose Image</label>
+        <label for="imageInput">Choose image</label>
         <input type="file" id="imageInput" accept="image/*" required>
       </div>
 
       <div class="form-group">
-        <label for="targetSize">Target Maximum Size</label>
+        <label for="targetSize">Target size</label>
         <select id="targetSize">
-          <option value="1">&lt;1MB (Max 1 MB)</option>
-          <option value="5" selected>&lt;5MB (Max 5 MB)</option>
-          <option value="10">&lt;10MB (Max 10 MB)</option>
-          <option value="20">&lt;20MB (Max 20 MB)</option>
+          <option value="1" selected>&lt; 1MB</option>
+          <option value="5">&lt; 5MB</option>
+          <option value="10">&lt; 10MB</option>
+          <option value="20">&lt; 20MB</option>
         </select>
       </div>
 
-      <button type="submit" id="submitBtn">Resize Image</button>
+      <button type="submit" id="submitBtn">Resize</button>
     </form>
 
     <div id="status"></div>
 
-    <div id="stats" class="stats">
-      <div><strong>Original:</strong> <span id="origInfo">-</span></div>
-      <div><strong>Result:</strong> <span id="resultInfo">-</span></div>
+    <div id="info" class="info">
+      <div>Original: <span id="origInfo"></span></div>
+      <div>Resized: <span id="resultInfo"></span></div>
     </div>
 
-    <div id="previewContainer">
-      <img id="previewImage" alt="Preview of resized image">
-    </div>
+    <img id="preview" alt="Preview">
 
-    <a id="downloadBtn" download="resized-document.jpg">Download Resized Image</a>
+    <a id="downloadBtn" download="resized.jpg">Download Image</a>
   </main>
 
   <script>
-    /*
-      =============================================================================
-      VERIFIABLY OFFLINE CLIENT-SIDE CODE
-      This script processes images purely within your browser using HTML5 Canvas.
-      No data, analytics, or images are ever sent anywhere.
-      =============================================================================
-    */
-
-    const imageInput = document.getElementById('imageInput');
-    const targetSizeSelect = document.getElementById('targetSize');
+    const fileInput = document.getElementById('imageInput');
+    const targetSelect = document.getElementById('targetSize');
     const submitBtn = document.getElementById('submitBtn');
-    const statusDiv = document.getElementById('status');
-    const statsDiv = document.getElementById('stats');
-    const origInfoSpan = document.getElementById('origInfo');
-    const resultInfoSpan = document.getElementById('resultInfo');
+    const statusEl = document.getElementById('status');
+    const infoEl = document.getElementById('info');
+    const origInfo = document.getElementById('origInfo');
+    const resultInfo = document.getElementById('resultInfo');
     const downloadBtn = document.getElementById('downloadBtn');
-    const previewContainer = document.getElementById('previewContainer');
-    const previewImage = document.getElementById('previewImage');
+    const preview = document.getElementById('preview');
 
-    let currentFile = null;
-    let objectUrl = null;
+    let currentUrl = null;
 
-    // Format byte count to human-readable string (KB / MB)
-    function formatBytes(bytes) {
+    function formatSize(bytes) {
       if (bytes < 1024) return bytes + ' B';
       if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
       return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
     }
 
-    // Auto-display original file info when file is selected
-    imageInput.addEventListener('change', () => {
-      currentFile = imageInput.files[0];
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
       downloadBtn.style.display = 'none';
-      previewContainer.style.display = 'none';
-      statsDiv.style.display = 'none';
-
-      if (currentFile) {
-        statusDiv.textContent = `Selected: ${currentFile.name} (${formatBytes(currentFile.size)})`;
-      } else {
-        statusDiv.textContent = '';
-      }
+      preview.style.display = 'none';
+      infoEl.style.display = 'none';
+      statusEl.textContent = file ? `${file.name} (${formatSize(file.size)})` : '';
     });
 
-    // Helper: compress canvas to JPEG Blob at a given quality (0.0 to 1.0)
     function canvasToBlob(canvas, quality) {
       return new Promise((resolve) => {
         canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
       });
     }
 
-    // Main resizing & compression logic
-    async function processImage() {
-      if (!imageInput.files || imageInput.files.length === 0) {
-        statusDiv.textContent = 'Please choose an image file first.';
-        return;
-      }
+    async function resizeImage() {
+      if (!fileInput.files || fileInput.files.length === 0) return;
 
-      const file = imageInput.files[0];
-      const targetMB = parseFloat(targetSizeSelect.value);
-      // Target limit with safe 2% margin to guarantee being under strict server limits
+      const file = fileInput.files[0];
+      const targetMB = parseFloat(targetSelect.value);
       const maxBytes = Math.floor(targetMB * 1024 * 1024 * 0.98);
 
       submitBtn.disabled = true;
       downloadBtn.style.display = 'none';
-      statusDiv.textContent = 'Processing image locally...';
+      statusEl.textContent = 'Processing...';
 
       try {
-        // If file is already smaller than the target, no need to reduce quality
         if (file.size <= maxBytes) {
-          origInfoSpan.textContent = `${formatBytes(file.size)}`;
-          resultInfoSpan.textContent = `${formatBytes(file.size)} (Already within <${targetMB}MB limit)`;
-          statsDiv.style.display = 'block';
+          origInfo.textContent = formatSize(file.size);
+          resultInfo.textContent = `${formatSize(file.size)} (already under limit)`;
+          infoEl.style.display = 'block';
 
-          if (objectUrl) URL.revokeObjectURL(objectUrl);
-          objectUrl = URL.createObjectURL(file);
+          if (currentUrl) URL.revokeObjectURL(currentUrl);
+          currentUrl = URL.createObjectURL(file);
 
-          downloadBtn.href = objectUrl;
+          preview.src = currentUrl;
+          preview.style.display = 'block';
+
+          downloadBtn.href = currentUrl;
           downloadBtn.download = file.name;
           downloadBtn.style.display = 'block';
 
-          previewImage.src = objectUrl;
-          previewContainer.style.display = 'block';
-
-          statusDiv.textContent = 'Done! File is already smaller than target size.';
+          statusEl.textContent = 'File is already within selected target.';
           submitBtn.disabled = false;
           return;
         }
 
-        // Load image into an HTML Image element
         const img = new Image();
         const initialUrl = URL.createObjectURL(file);
 
         await new Promise((resolve, reject) => {
           img.onload = () => resolve();
-          img.onerror = () => reject(new Error('Failed to load image file.'));
+          img.onerror = () => reject(new Error('Failed to load image.'));
           img.src = initialUrl;
         });
         URL.revokeObjectURL(initialUrl);
 
         let width = img.naturalWidth;
         let height = img.naturalHeight;
-        origInfoSpan.textContent = `${formatBytes(file.size)} (${width} × ${height} px)`;
+        origInfo.textContent = `${formatSize(file.size)} (${width}x${height})`;
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
         let bestBlob = null;
         let scale = 1.0;
-        const maxAttempts = 8;
-        let attempt = 0;
 
-        /*
-          Smart quality & scale optimization:
-          1. Try current dimensions with high-to-moderate JPEG quality.
-          2. If file size remains over limit even at quality 0.5, downscale resolution
-             by 15% and try again. This keeps scanned document text sharp and legible.
-        */
-        while (attempt < maxAttempts) {
-          attempt++;
+        for (let attempt = 0; attempt < 8; attempt++) {
           canvas.width = Math.round(width * scale);
           canvas.height = Math.round(height * scale);
 
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-          // Binary search for highest quality that satisfies target size
           let lowQuality = 0.45;
           let highQuality = 0.92;
-          let candidateBlob = null;
+          let candidate = null;
 
           for (let iter = 0; iter < 5; iter++) {
-            const testQuality = (lowQuality + highQuality) / 2;
-            const blob = await canvasToBlob(canvas, testQuality);
+            const quality = (lowQuality + highQuality) / 2;
+            const blob = await canvasToBlob(canvas, quality);
 
             if (blob.size <= maxBytes) {
-              candidateBlob = blob;
-              // Try higher quality to preserve visual fidelity
-              lowQuality = testQuality;
+              candidate = blob;
+              lowQuality = quality;
             } else {
-              // Exceeds target, try lower quality
-              highQuality = testQuality;
+              highQuality = quality;
             }
           }
 
-          if (candidateBlob) {
-            bestBlob = candidateBlob;
+          if (candidate) {
+            bestBlob = candidate;
             break;
           }
 
-          // If even quality 0.45 is over limit, step down the dimensions
           scale *= 0.85;
         }
 
-        // Fallback: if loop finished without candidate, take smallest possible blob
         if (!bestBlob) {
           bestBlob = await canvasToBlob(canvas, 0.40);
         }
 
-        // Clean up previous URL and create new download URL
-        if (objectUrl) URL.revokeObjectURL(objectUrl);
-        objectUrl = URL.createObjectURL(bestBlob);
+        if (currentUrl) URL.revokeObjectURL(currentUrl);
+        currentUrl = URL.createObjectURL(bestBlob);
 
-        // Update UI
-        resultInfoSpan.textContent = `${formatBytes(bestBlob.size)} (${canvas.width} × ${canvas.height} px)`;
-        statsDiv.style.display = 'block';
+        resultInfo.textContent = `${formatSize(bestBlob.size)} (${canvas.width}x${canvas.height})`;
+        infoEl.style.display = 'block';
 
-        const originalBase = file.name.replace(/\.[^/.]+$/, "");
-        downloadBtn.href = objectUrl;
-        downloadBtn.download = `${originalBase}-resized.jpg`;
+        preview.src = currentUrl;
+        preview.style.display = 'block';
+
+        const baseName = file.name.replace(/\.[^/.]+$/, "");
+        downloadBtn.href = currentUrl;
+        downloadBtn.download = `${baseName}-resized.jpg`;
         downloadBtn.style.display = 'block';
 
-        previewImage.src = objectUrl;
-        previewContainer.style.display = 'block';
-
-        statusDiv.textContent = `Success! Reduced from ${formatBytes(file.size)} to ${formatBytes(bestBlob.size)}.`;
+        statusEl.textContent = 'Done.';
       } catch (err) {
-        statusDiv.textContent = 'Error: ' + err.message;
+        statusEl.textContent = 'Error: ' + err.message;
       } finally {
         submitBtn.disabled = false;
       }
